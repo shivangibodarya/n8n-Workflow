@@ -1,0 +1,278 @@
+{
+  "name": "Wordpress post",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "1c7992a1-5981-4348-8771-36cdd143904b",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "6841bfea-1559-4dde-a970-acb40fed52d6",
+      "name": "Webhook",
+      "webhookId": "1c7992a1-5981-4348-8771-36cdd143904b"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "articles",
+          "mode": "list",
+          "cachedResultName": "articles"
+        },
+        "limit": 1,
+        "where": {
+          "values": [
+            {
+              "column": "id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "column": "status",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "2803629e-1ab4-4a7a-829d-7c795062ae1c",
+      "name": "Select rows from a table",
+      "credentials": {
+        "mySql": {
+          "id": "ajbHmvxvBQ7PhASS",
+          "name": "Supplychain360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "title": "={{ $('Markdown1').first().json['Title(HTML)'] }}",
+        "additionalFields": {
+          "content": "={{ $json[\"Body(HTML)\"] }}",
+          "slug": "={{ $json.wp_slug }}",
+          "status": "draft"
+        }
+      },
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [
+        448,
+        96
+      ],
+      "id": "ad40ae7f-971c-42a4-aad7-67828dd23ab2",
+      "name": "Create a post",
+      "credentials": {
+        "wordpressApi": {
+          "id": "xCACB9EsqnpGBq04",
+          "name": "Wordpress account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": \"True\",\n  \"message\": \"Post successfully added to WordPress!\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        896,
+        96
+      ],
+      "id": "699e4ea2-ffa8-487c-bd2f-a62b462aea69",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "table": {
+          "__rl": true,
+          "value": "articles",
+          "mode": "list",
+          "cachedResultName": "articles"
+        },
+        "dataMode": "defineBelow",
+        "columnToMatchOn": "id",
+        "valueToMatchOn": "={{ $('Select rows from a table').item.json.id }}",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "wp_post_id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        672,
+        96
+      ],
+      "id": "3de083b3-93b9-40a9-96c4-f3cb9b35286e",
+      "name": "Insert or update rows in a table",
+      "credentials": {
+        "mySql": {
+          "id": "ajbHmvxvBQ7PhASS",
+          "name": "Supplychain360"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.body }}",
+        "destinationKey": "Body(HTML)",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fc2297d5-f460-433d-a9d0-ba4f5246b9d6",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.title }}",
+        "destinationKey": "Title(HTML)",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "6f40dda3-1c61-4a05-8e61-dbb72c050b16",
+      "name": "Markdown1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        224,
+        96
+      ],
+      "id": "61db00de-0bb9-4617-9e0c-6af3e59cb37f",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select rows from a table": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Markdown1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a post": {
+      "main": [
+        [
+          {
+            "node": "Insert or update rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert or update rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "faf1fbcf-4583-4b8f-b35b-ff0f9358ce21",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9272721148ea09184b6bbb7ce6219dab088562dd450e2df8280d57c2e34c7d84"
+  },
+  "id": "9jVisH3c6QUHUune",
+  "tags": []
+}

@@ -1,0 +1,538 @@
+{
+  "name": "E-Commerce Personalised Marketing",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "f0ecc3ee-3e8b-46f3-9ed7-908bdb7659d8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -112
+      ],
+      "id": "2a2f4b79-e91d-43e9-94dd-03a46c91aaaa",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        208,
+        128
+      ],
+      "id": "053fe904-9182-4e15-87a8-7478217f85e3",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-r1-distill-llama-70b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        656,
+        112
+      ],
+      "id": "075fa575-4385-4a2c-8625-b1d4afa0321a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "WqnhB3HhvhCGuZ60",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"personalised message\": \"...\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        112
+      ],
+      "id": "71f497a4-a3cf-4ac3-abf8-4c7ac95480ea",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY",
+          "mode": "list",
+          "cachedResultName": "E-Commerce Personalised Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 406561137,
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit#gid=406561137"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "=Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -144,
+        -16
+      ],
+      "id": "8811a6fb-b9d1-4dfb-86c4-b4884da98cbe",
+      "name": "Get Order Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oztTa0ZzQpSyJzhB",
+          "name": "Shivangi-Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "02e58d48-3dc4-4c31-8118-334188ddfda6",
+              "leftValue": "={{ new Date($json[\"Last Purchase Date\"]) <= new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }}",
+              "rightValue": "={{ new Date($json[\"Last Purchase Date\"]) <= new Date(Date.now() - 30*24*60*60*1000) }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        -16
+      ],
+      "id": "a2f4bb7d-40a5-43c7-8a81-3008cd5c7543",
+      "name": "If Not Place Order"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY",
+          "mode": "list",
+          "cachedResultName": "E-Commerce Personalised Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Offer Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Applicable Segment",
+              "lookupValue": "={{ $json[\"Customer Segment\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        -96
+      ],
+      "id": "0533acb1-0cfe-432d-8ba7-4df47ee1b0b9",
+      "name": "Get User According Offer",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oztTa0ZzQpSyJzhB",
+          "name": "Shivangi-Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional copywriter specialized in creating highly engaging, personalized marketing messages for customers. Using the following offer details, craft a friendly, attractive, and personalized message that encourages the customer to take action.  \n\nOffer Details:\n- Offer Code: {{ $json['Offer Code'] }}\n- Offer Type: {{ $json['Offer Type'] }}\n- Discount/Benefit: {{ $json['Discount/Benefit'] }}\n- Validity:{{ $json['Validity (Days)'] }}\n- Applicable Customer Segment: {{ $json['Applicable Segment'] }}\n- Customer name:{{ $('Loop Over Items').item.json.Name }}\n\nRequirements:\n1. Address the customer warmly and personally.\n2. Mention the offer clearly and its benefit (15% off).\n3. Highlight urgency (valid for 3 days only).\n4. Encourage them to act now.\n5. Keep it professional yet friendly.\n6. Optional: Include a subtle reminder that they are valued or missed.\n7.add Emojies\n\n⚠️ Important: Return the output **only** in JSON format as follows:\n\n{\n  \"personalised message\": \"...\"\n}\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "808ab661-e9b5-4c69-99f6-e57a6fa84a85",
+      "name": "Generate Personalised Message"
+    },
+    {
+      "parameters": {
+        "from": "=+14155238886",
+        "to": "=+{{ $('Loop Over Items').item.json['Phone Number'] }}",
+        "toWhatsapp": true,
+        "message": "={{ $json.output['personalised message'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -96
+      ],
+      "id": "31ed8600-2ad2-4c1e-8b3c-ac34a3a6ee35",
+      "name": "Send Message to User(Whatspp)",
+      "credentials": {
+        "twilioApi": {
+          "id": "6iQoIInPmlEmV6R4",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY",
+          "mode": "list",
+          "cachedResultName": "E-Commerce Personalised Marketing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 406561137,
+          "mode": "list",
+          "cachedResultName": "Order Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit#gid=406561137"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "=Messagesend-({{$now}})",
+            "Customer ID": "={{ $('Loop Over Items').item.json['Customer ID'] }}"
+          },
+          "matchingColumns": [
+            "Customer ID"
+          ],
+          "schema": [
+            {
+              "id": "Customer ID",
+              "displayName": "Customer ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Purchase Date",
+              "displayName": "Last Purchase Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Total Orders",
+              "displayName": "Total Orders",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Total Spend",
+              "displayName": "Total Spend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Customer Segment",
+              "displayName": "Customer Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Order Status",
+              "displayName": "Order Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Offer Assigned",
+              "displayName": "Offer Assigned",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1152,
+        -96
+      ],
+      "id": "7f9a7f0a-12c6-4632-8592-5f835a5e91d8",
+      "name": "Status Update",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oztTa0ZzQpSyJzhB",
+          "name": "Shivangi-Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Sample Sheet\nhttps://docs.google.com/spreadsheets/d/1CqnDSKRJ11cAEka1Az57ReI3KihvQ7ZmF9Wz-UX_WIY/edit?gid=0#gid=0",
+        "height": 112,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -272,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "9f330a98-8f52-4550-bcd5-451dedee74ec",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get User According Offer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Personalised Message",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Personalised Message",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order Data": {
+      "main": [
+        [
+          {
+            "node": "If Not Place Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Not Place Order": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User According Offer": {
+      "main": [
+        [
+          {
+            "node": "Generate Personalised Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Personalised Message": {
+      "main": [
+        [
+          {
+            "node": "Send Message to User(Whatspp)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message to User(Whatspp)": {
+      "main": [
+        [
+          {
+            "node": "Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status Update": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "175194d3-c1d8-4c20-b475-82ab7b7d654a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9272721148ea09184b6bbb7ce6219dab088562dd450e2df8280d57c2e34c7d84"
+  },
+  "id": "DKvawzYFiCOIVgpJ",
+  "tags": []
+}

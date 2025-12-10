@@ -1,0 +1,682 @@
+{
+  "name": "Hospitality-Feedback Collection & Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Review Matter",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Guest Name"
+            },
+            {
+              "fieldLabel": "Email"
+            },
+            {
+              "fieldLabel": "How would you rate your overall stay with us? (1–5 scale)",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1"
+                  },
+                  {
+                    "option": "2"
+                  },
+                  {
+                    "option": "3"
+                  },
+                  {
+                    "option": "4"
+                  },
+                  {
+                    "option": "5"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "What made your stay enjoyable or what could we improve?"
+            },
+            {
+              "fieldLabel": "How friendly and helpful was our staff? (1–5 scale)",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1"
+                  },
+                  {
+                    "option": "2"
+                  },
+                  {
+                    "option": "3"
+                  },
+                  {
+                    "option": "4"
+                  },
+                  {
+                    "option": "5"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Please share your experience with our staff during your stay."
+            },
+            {
+              "fieldLabel": "How would you rate the cleanliness and comfort of your room? (1–5 scale)",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1"
+                  },
+                  {
+                    "option": "2"
+                  },
+                  {
+                    "option": "3"
+                  },
+                  {
+                    "option": "4"
+                  },
+                  {
+                    "option": "5"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "What did you like most about your room, and what could be improved?"
+            },
+            {
+              "fieldLabel": "How satisfied were you with our food & dining options? (1–5 scale)",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1"
+                  },
+                  {
+                    "option": "2"
+                  },
+                  {
+                    "option": "3"
+                  },
+                  {
+                    "option": "4"
+                  },
+                  {
+                    "option": "5"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "What dish or dining experience stood out to you, good or bad?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        -48
+      ],
+      "id": "d5fd9f5e-b8b1-4d0a-89a9-0d694e287212",
+      "name": "On form submission",
+      "webhookId": "a9d080a4-c442-4f2e-937a-5ed45d2ac99c"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E",
+          "mode": "list",
+          "cachedResultName": "Hospitality-Feedback Collection & Analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Guest Name": "={{ $json['Guest Name'] }}",
+            "Email": "={{ $json.Email }}",
+            "overall stay Rate": "={{ $json[\"How would you rate your overall stay with us? (1–5 scale)\"] }}",
+            "staff rate": "={{ $json[\"How friendly and helpful was our staff? (1–5 scale)\"] }}",
+            "cleanliness and comfort Rate": "={{ $json[\"How would you rate the cleanliness and comfort of your room? (1–5 scale)\"] }}",
+            "food & dining Rate": "={{ $json[\"How satisfied were you with our food & dining options? (1–5 scale)\"] }}",
+            "overall stay Feedback": "={{ $json[\"What made your stay enjoyable or what could we improve?\"] }}",
+            "staff Feedback": "={{ $json[\"Please share your experience with our staff during your stay.\"] }}",
+            "cleanliness and comfort Feedback": "={{ $json[\"What did you like most about your room, and what could be improved?\"] }}",
+            "food & dining Feedback": "={{ $json[\"How satisfied were you with our food & dining options? (1–5 scale)\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Guest Name",
+              "displayName": "Guest Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "overall stay Rate",
+              "displayName": "overall stay Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "staff rate",
+              "displayName": "staff rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cleanliness and comfort Rate",
+              "displayName": "cleanliness and comfort Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "food & dining Rate",
+              "displayName": "food & dining Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "overall stay Feedback",
+              "displayName": "overall stay Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "staff Feedback",
+              "displayName": "staff Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cleanliness and comfort Feedback",
+              "displayName": "cleanliness and comfort Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "food & dining Feedback",
+              "displayName": "food & dining Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "overall stay Sentiment",
+              "displayName": "overall stay Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "staff Sentiment",
+              "displayName": "staff Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cleanliness and comfort Sentiment",
+              "displayName": "cleanliness and comfort Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "food & dining Sentiment",
+              "displayName": "food & dining Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        -48
+      ],
+      "id": "4e511e49-7ab0-471a-89f3-43360ffe9590",
+      "name": "Review Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oztTa0ZzQpSyJzhB",
+          "name": "Shivangi-Google Sheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Sample Sheet\nhttps://docs.google.com/spreadsheets/d/1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E",
+        "height": 96,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -448,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "0f9e7443-4141-49f6-bbcd-613850c3d40c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a sentiment analysis assistant.  \nAnalyze the following guest feedback with their ratings and text.  \nFor each category, return only the sentiment (Positive, Neutral, Negative).  \n\nGuest Feedback Data:  \n- Guest Name: {{ $json['Guest Name'] }}\n- Email: {{ $json.Email }}\n- Overall Stay Rate: {{ $json['overall stay Rate'] }}\n- Staff Rate:{{ $json['staff rate'] }} \n- Cleanliness and Comfort Rate: {{ $json['cleanliness and comfort Rate'] }}\n- Food & Dining Rate: {{ $json['food & dining Rate'] }}\n- Overall Stay Feedback: {{ $json['overall stay Feedback'] }}\n- Staff Feedback: {{ $json['staff Feedback'] }}\n- Cleanliness and Comfort Feedback: {{ $json['cleanliness and comfort Feedback'] }}\n- Food & Dining Feedback: {{ $json['food & dining Feedback'] }}\n\nReturn result in JSON format with only these fields:  \n{\n  \"overall stay Sentiment\": \"\",\n  \"staff Sentiment\": \"\",\n  \"cleanliness and comfort Sentiment\": \"\",\n  \"food & dining Sentiment\": \"\"\n}\n\nAlso, at the end, provide the **average sentiment** across all categories.\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -80,
+        -48
+      ],
+      "id": "b849e83c-bcfd-4abc-aa4b-2c392b45e001",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3.1:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        144
+      ],
+      "id": "a62d073b-a5ce-40ef-9bb9-9029646e4f65",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "WqnhB3HhvhCGuZ60",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"overall stay Sentiment\": \"\",\n  \"staff Sentiment\": \"\",\n  \"cleanliness and comfort Sentiment\": \"\",\n  \"food & dining Sentiment\": \"\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        144
+      ],
+      "id": "d7e772b3-e2c6-416e-844b-9839fb569cc6",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "Thank You for Your Feedback! 🌟",
+        "emailType": "text",
+        "message": "=Dear {{ $('On form submission').item.json['Guest Name'] }},  \n\nThank you for sharing your experience with us! 😊 We’re thrilled to hear that you enjoyed your stay. 🏨✨  \n\nYour feedback motivates our team to keep delivering exceptional service. 💪 We hope to welcome you again soon!  \n\nWarm regards,  \nDara Team 💛\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        -112
+      ],
+      "id": "7c9f5b6c-c876-4286-9770-1bc8e2546d35",
+      "name": "Send User To Feedback Email",
+      "webhookId": "e57227ff-7e82-4cc8-8d83-c46688946773",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tFIa8CAqigRPLvO1",
+          "name": "shivangi-Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E",
+          "mode": "list",
+          "cachedResultName": "Hospitality-Feedback Collection & Analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1V1VmZpARS46i_hjXCcBTWIhgP1AhkvfHKiXNP_tho5E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Review Log').item.json.Email }}",
+            "overall stay Sentiment": "={{ $json.output[\"overall stay Sentiment\"] }}",
+            "staff Sentiment": "={{ $json.output[\"staff Sentiment\"] }}",
+            "cleanliness and comfort Sentiment": "={{ $json.output[\"cleanliness and comfort Sentiment\"] }}",
+            "food & dining Sentiment": "={{ $json.output[\"food & dining Sentiment\"] }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Guest Name",
+              "displayName": "Guest Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "overall stay Rate",
+              "displayName": "overall stay Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "staff rate",
+              "displayName": "staff rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cleanliness and comfort Rate",
+              "displayName": "cleanliness and comfort Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "food & dining Rate",
+              "displayName": "food & dining Rate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "overall stay Feedback",
+              "displayName": "overall stay Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "staff Feedback",
+              "displayName": "staff Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cleanliness and comfort Feedback",
+              "displayName": "cleanliness and comfort Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "food & dining Feedback",
+              "displayName": "food & dining Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "overall stay Sentiment",
+              "displayName": "overall stay Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "staff Sentiment",
+              "displayName": "staff Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cleanliness and comfort Sentiment",
+              "displayName": "cleanliness and comfort Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "food & dining Sentiment",
+              "displayName": "food & dining Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        64
+      ],
+      "id": "893f2e50-3d50-417b-a850-7333e5988b17",
+      "name": "Append Sentiment in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oztTa0ZzQpSyJzhB",
+          "name": "Shivangi-Google Sheet"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Review Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Log": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send User To Feedback Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append Sentiment in Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send User To Feedback Email": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "21abfa6a-e9f3-45dc-9813-d157fa7e50bf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9272721148ea09184b6bbb7ce6219dab088562dd450e2df8280d57c2e34c7d84"
+  },
+  "id": "T5cNaOKdZdy2ROus",
+  "tags": []
+}

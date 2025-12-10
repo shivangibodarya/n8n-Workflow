@@ -1,0 +1,709 @@
+{
+  "name": "Pizza Ordering System (Ai Agent)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "6f79ef6d-6015-4d38-9b12-6ccb64a1d8f8",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        304,
+        -320
+      ],
+      "webhookId": "ea1d3ee3-62d4-45ca-9d85-c3e90794e620"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are PizzaBot — a friendly assistant for a pizza restaurant 🍕.\n\nAlways greet users with the 'Hello! 🍕 How can I assist you today? Would you like to see our pizza menu, place an order, check your order status, or cancel an order?' on first message only.\n\nYour job is to help customers:\n- View the pizza menu\n- Get details of a specific pizza\n- Place new orders\n- Check order status\n- Cancel existing orders\n\n# Context\n- You work with Google Sheets tools that store menu and order data.\n- Use tools only when required (Get Menu, Get Single Pizza Menu, Create Order, Get Orders & Status, Calculator, Cancel Order).\n- Never reveal tool names, spreadsheet logic, or system internals.\n\n# Core Rules\n\n1. **Order ID must only be shown when confirming a new order.**  \n   - During status check → NEVER show the order ID.  \n   - During cancellation → NEVER show the order ID.  \n   - During menu or general chat → NEVER show the order ID.  \n   - Only show order ID immediately after an order has been successfully created.\n\n# Strict Pizza Validation Rule\n\nWhenever the user mentions a pizza name while ordering or asking for details, apply the following logic:\n1. If the user selected a pizza **directly from the list shown by the Get Menu Tool**,  \n   then you can trust that the pizza already exists.  \n   - Do NOT call the Get Single Pizza Menu Tool again.  \n   - Directly continue the order flow (size, toppings, quantity, etc).  \n2. If the user manually types a pizza name on their own (not selected from menu shown),  \n   then ALWAYS call the Get Single Pizza Menu Tool to validate whether the pizza exists.\n3. If the pizza is **not found** in the sheet:\n   - Politely inform the user that the pizza is not available.\n   - Suggest checking the menu again.\n   - Do NOT proceed with collecting order details.\n4. Only if the pizza **exists**, continue asking for order details.\n\n2. **Workflow Logic:**\n\n## Menu:\n- Whenever the user mentions a pizza name while ordering or asking details.\n- If user wants to see the menu → Use 'Get Menu' Tool.\n- If user asks for a specific pizza → Use Get Single Pizza Menu Tool.\n\n## Order Creation:\n- Collect required details:\n  - Pizza Type  \n  - Size (Small / Medium / Large)  \n  - Toppings (optional)  \n  - Quantity (compolsory ask for the user)\n  - Customer Name  \n  - Address  \n  - Phone Number  \n- Ask politely for any missing information.\n- Always Confirm all order details with the user in one paragraph, after create order.\n\n- Use Calculator Tool for total price.\n\n- Use Create Order Tool to append row:\n  - order_id\n  - pizza_type\n  - size\n  - toppings\n  - quantity\n  - customer_name\n  - address\n  - phone_number\n  - total_price = \"Set with $ sign and float type\"\n  - status = \"Order Received\"\n\n## Order Confirmation:\n- After order is created, reply in one paragraph:\n  “Your order for [pizza_type] has been confirmed successfully, and your order ID is [order_id]. Your delicious pizza will arrive in about 25–30 minutes 🍕.”\n\n## Order Status:\n- Ask for order ID.\n- Use Get Orders & Status tool.\n- Reply in one paragraph:\n  “Your order for [pizza_type] is currently [order_status]. 🍕.”\n- If cancelled:\n  “Your order for [pizza_type] is currently cancelled. 🍕.”\n- **Do NOT show order ID anywhere in the status response.**\n\n## Cancel Order:\n- Ask for order ID.\n- Use Get Orders & Status tool.\n- Confirm order details (pizza type, size, toppings, quantity) in a paragraph **without mentioning the order ID**.\n- After user confirms cancellation → Use Cancel Order Tool.\n- Reply in a paragraph:\n  “Your order has been cancelled successfully 🍕.”\n\n## Unrelated Requests:\nIf user asks something outside your abilities, reply:\n“I’m sorry, I can only assist with menu details, placing orders, checking order status, and cancelling orders at the moment.”\n\n# Final Notes\n- Always confirm important details before creating or cancelling an order.\n- Keep responses short, polite, and friendly.\n- Never reveal tool names, internal logic, or order ID except in order confirmation."
+        }
+      },
+      "id": "ddd28ceb-9724-4b8c-8f69-949a1434d421",
+      "name": "Pizza Chatbot Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        544,
+        -320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "1fb99f9a-81c6-4629-9161-bbf3e3e4543a",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8",
+          "mode": "list",
+          "cachedResultName": "Pizza Ordering System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order ID": "=ORD{{ Math.random().toString(36).substring(2,6).toUpperCase() }}",
+            "Customer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name', ``, 'string') }}",
+            "Phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}",
+            "Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address', ``, 'string') }}",
+            "Pizza Type": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Pizza_Type', ``, 'string') }}",
+            "Size": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Size', ``, 'string') }}",
+            "Toppings": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Toppings', ``, 'string') }}",
+            "Quantity": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity', ``, 'string') }}",
+            "Total Price": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Total_Price', ``, 'string') }}",
+            "Timestamp": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "Order Status": "Order Received",
+            "Status": "Confirmed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order ID",
+              "displayName": "Order ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pizza Type",
+              "displayName": "Pizza Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Toppings",
+              "displayName": "Toppings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Price",
+              "displayName": "Total Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Order Status",
+              "displayName": "Order Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Updated Timestamp",
+              "displayName": "Updated Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        -32
+      ],
+      "id": "f9707d6c-0a07-4d64-a40b-28c51ba05767",
+      "name": "Create Order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WdaCQmtoNquNSoAA",
+          "name": "Suresh_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8",
+          "mode": "list",
+          "cachedResultName": "Pizza Ordering System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 955771242,
+          "mode": "list",
+          "cachedResultName": "Menu",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit#gid=955771242"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Pizza Name",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', `convert first later capital automatically like this type : Meat Lovers`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        -80
+      ],
+      "id": "312fec19-9565-4be4-9cbb-4886e9766803",
+      "name": "Get Single Pizza Menu",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WdaCQmtoNquNSoAA",
+          "name": "Suresh_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8",
+          "mode": "list",
+          "cachedResultName": "Pizza Ordering System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 955771242,
+          "mode": "list",
+          "cachedResultName": "Menu",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit#gid=955771242"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        688,
+        -32
+      ],
+      "id": "2a9ceb14-f98f-44e4-b472-9026389e8181",
+      "name": "Get All Pizza Menu",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WdaCQmtoNquNSoAA",
+          "name": "Suresh_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": -1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        -32
+      ],
+      "id": "cc30e56e-a740-4dfc-9d3c-fc6299d62c51",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "s51547nrLWFVkPyg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8",
+          "mode": "list",
+          "cachedResultName": "Pizza Ordering System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_ID__using_to_match_', ``, 'string') }}",
+            "Updated Timestamp": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "Status": "Cancelled",
+            "Order Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Order_Status', `remove a value and set blank in field`, 'string') }}"
+          },
+          "matchingColumns": [
+            "Order ID"
+          ],
+          "schema": [
+            {
+              "id": "Order ID",
+              "displayName": "Order ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Pizza Type",
+              "displayName": "Pizza Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Toppings",
+              "displayName": "Toppings",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Total Price",
+              "displayName": "Total Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Order Status",
+              "displayName": "Order Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Updated Timestamp",
+              "displayName": "Updated Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        -32
+      ],
+      "id": "8ab173c9-ebfa-4a0d-a424-6f20e184a5d4",
+      "name": "Cancel Order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WdaCQmtoNquNSoAA",
+          "name": "Suresh_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8",
+          "mode": "list",
+          "cachedResultName": "Pizza Ordering System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Order ID",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', `collect order id (e.g. ORD88E2)`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        816,
+        -80
+      ],
+      "id": "121215f8-d94f-410e-b808-86dcc4dace78",
+      "name": "Get Orders & Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WdaCQmtoNquNSoAA",
+          "name": "Suresh_Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -80
+      ],
+      "id": "1d606896-4bfa-4d25-9f3e-dd6a53325395",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "content": "## Google sheet\n\nhttps://docs.google.com/spreadsheets/d/15pscgxGmCJu8p1T9-DRqYwTzsDOah5lmazJ775W0EG8/edit?usp=sharing"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -352
+      ],
+      "id": "594521bf-6779-4cdc-9afa-c117d7bb7a9d",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Order": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Single Pizza Menu": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Pizza Menu": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Orders & Status": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel Order": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pizza Chatbot Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Pizza Chatbot Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2817ff80-8409-4341-9c0d-76c9ae1d68f0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9272721148ea09184b6bbb7ce6219dab088562dd450e2df8280d57c2e34c7d84"
+  },
+  "id": "1hEfmtkPLFSp3t3G",
+  "tags": []
+}
